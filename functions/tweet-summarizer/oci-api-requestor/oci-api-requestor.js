@@ -8,10 +8,13 @@ var jsSHA = require("jssha");
 //const configs = require('./oci-configuration').configs;
 
 const executeOCIAPIRequest = async function (requestOptions, body) {
-    assert(process.env.PRIVATE_KEY_FILE != null)
+    assert(process.env.PRIVATE_KEY_FILE != null || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM != null)
     assert(process.env.KEY_FINGERPRINT != null)
     assert(process.env.TENANCY_ID != null)
     assert(process.env.USER_ID != null)
+
+
+
 
     return new Promise((resolve, reject) => {
         // construct request and the handling of the response by resolving the promise
@@ -42,14 +45,40 @@ const executeOCIAPIRequest = async function (requestOptions, body) {
 
 function signRequest(request, body = "") {
 
-    const privateKeyPath = process.env.PRIVATE_KEY_FILE
+
+    const privateKeyPath = process.env.PRIVATE_KEY_FILE || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM  // the last one is set by OCI for resource principal enabled functions
     const privateKey = fs.readFileSync(privateKeyPath, 'ascii');
+
     const options = {}
     options['privateKey'] = privateKey
-    options['keyFingerprint'] = process.env.KEY_FINGERPRINT
-    options['tenancyId'] = process.env.TENANCY_ID
-    options['userId'] = process.env.USER_ID
+
+
+
     options.passphrase = null
+
+
+    let resourcePrincipalEnabled = process.env.OCI_RESOURCE_PRINCIPAL_RPST != null
+    if (resourcePrincipalEnabled) {
+        const sessionTokenFilePath = process.env.OCI_RESOURCE_PRINCIPAL_RPST
+        const rpst = fs.readFileSync(sessionTokenFilePath, { encoding: 'utf8' })
+        const payload = rpst.split('.')[1]
+        const buff = Buffer.from(payload, 'base64')
+        const payloadDecoded = buff.toString('ascii')
+        const claims = JSON.parse(payloadDecoded)
+
+        /* get tenancy id from claims */
+        options['tenancyId'] = claims.res_tenant
+        /*  set the keyId used to sign the request; the format here is the literal string 'ST$', followed by the entire contents of the RPST */
+        options["keyId"] = `ST$${rpst}`
+    } else {
+        options['tenancyId'] = process.env.TENANCY_ID
+        options["keyId"] = options.tenancyId + "/" + options.userId + "/" + options.keyFingerprint;
+        options['keyFingerprint'] = process.env.KEY_FINGERPRINT
+        options['userId'] = process.env.USER_ID
+    }
+
+
+
 
     sign(request, options, body);
 }
@@ -58,7 +87,7 @@ function signRequest(request, body = "") {
 // signing function as described at https://docs.cloud.oracle.com/Content/API/Concepts/signingrequests.htm
 function sign(request, options, body) {
 
-    var apiKeyId = options.tenancyId + "/" + options.userId + "/" + options.keyFingerprint;
+
 
     var headersToSign = [
         "host",
@@ -84,7 +113,7 @@ function sign(request, options, body) {
 
     httpSignature.sign(request, {
         key: options.privateKey,
-        keyId: apiKeyId,
+        keyId: options.keyId,
         headers: headersToSign,
         passphrase: options.passphrase // only required if the Private Key file is passphrase protected; note: 
     });
