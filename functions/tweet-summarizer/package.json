@@ -1,0 +1,19 @@
+{
+  "name": "tweet-summarizer",
+  "version": "1.0.0",
+  "description": "Consumes tweets for a specific hashtag over a specified period and writes a file on OCI Object Storage",
+  "main": "tweet-summarizer.js",
+  "scripts": {
+    "test": "jest --coverage=true --coverageProvider=v8"
+  },
+  "author": "Lucas Jellema",
+  "license": "ISC",
+  "dependencies": {
+    "twit": "^2.2.11",
+    "http-signature": "^1.3.1",
+    "jssha": "^2.3.1"
+  },
+  "devDependencies": {
+    "jest": "^26.3.0"
+  }
+}
