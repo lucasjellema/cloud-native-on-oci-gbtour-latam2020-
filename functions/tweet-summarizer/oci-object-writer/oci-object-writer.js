@@ -5,7 +5,7 @@ const ociAPIRequestor = require('../oci-api-requestor/oci-api-requestor.js');
 const writeObject = async function (content, objectName, bucketName) {
     assert(process.env.REGION !=null)
     assert(process.env.OCI_NAMESPACE !=null) 
-    
+    console.info(`oci-object-writer.writeObject $objectName to bucket $bucketName in namespace ${process.env.OCI_NAMESPACE}; content size ${content.length}`)
     const putRequestOptions = {
         host: `objectstorage.${process.env.REGION}.oraclecloud.com`,
         path: "/n/" + encodeURIComponent(process.env.OCI_NAMESPACE) + "/b/" + encodeURIComponent(bucketName) + "/o/" + encodeURIComponent(objectName),
