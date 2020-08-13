@@ -14,8 +14,6 @@ const executeOCIAPIRequest = async function (requestOptions, body) {
     assert(process.env.USER_ID != null)
 
 
-
-
     return new Promise((resolve, reject) => {
         // construct request and the handling of the response by resolving the promise
         const request = https.request(requestOptions, (res) => {
@@ -58,6 +56,7 @@ function signRequest(request, body = "") {
 
 
     let resourcePrincipalEnabled = process.env.OCI_RESOURCE_PRINCIPAL_RPST != null
+    console.info(`Resource Principal Enabled = ${resourcePrincipalEnabled}`)
     if (resourcePrincipalEnabled) {
         const sessionTokenFilePath = process.env.OCI_RESOURCE_PRINCIPAL_RPST
         const rpst = fs.readFileSync(sessionTokenFilePath, { encoding: 'utf8' })
