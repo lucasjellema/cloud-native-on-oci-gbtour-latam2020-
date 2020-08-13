@@ -16,6 +16,7 @@ const retrieveSecret = async function (secretOCID) {
         }
     };
     const response = await ociAPIRequestor.executeOCIAPIRequest(requestOptions, null)
+    console.log(`SecretRetriever - response from OCI API ${response}`)
     let secretContentBase64 = JSON.parse(response).secretBundleContent.content;
     return Buffer.from(secretContentBase64, 'base64').toString('ascii')  
 }

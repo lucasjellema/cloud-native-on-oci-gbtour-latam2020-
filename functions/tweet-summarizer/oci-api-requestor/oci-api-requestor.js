@@ -25,6 +25,7 @@ const executeOCIAPIRequest = async function (requestOptions, body) {
                 resolve(data)
             });
             res.on('error', (e) => {
+                console.warn(`exception in OCI API Request ${e}`)
                 reject(JSON.parse(e))
             });
         })
