@@ -14,7 +14,7 @@ const aggregateTweets = async function (hashtag, minutes = 5) {
     // prettify the tweets?
 
     const objectName = `tweets-${hashtag}-${new Date().toISOString().substr(0, 19)}.json`  //yyyy-mm-ddThh:mi:ss
-    const bucketName = "tweet-reports"
+    const bucketName = process.env.TWITTER_REPORTS_BUCKET || "twitter-reports"
 
     // the padEnd is added because it seems bytes are getting lost when creating the file object; spaces are added that can get lost without affecting the JSON content 
     
