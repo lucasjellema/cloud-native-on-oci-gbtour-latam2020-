@@ -15,10 +15,10 @@ const retrieveTweets = async function (hashtag, minutes = 5) {
 
 const getTwitterCredentials = async function () {
     // if env variable TWITTER_CREDENTIALS_SECRET_OCID is defined, then retrieve credentials from OCI Vault Secret
-    if (process.env.TWITTER_CREDENTIALS_SECRET_OCID) {
-
-        const secretRetriever = require('../oci-secret-retriever/oci-secret-retriever.js');
-        const secretOCID = process.env.TWITTER_CREDENTIALS_SECRET_OCID
+    const secretOCID = process.env.TWITTER_CREDENTIALS_SECRET_OCID
+    if (secretOCID) {
+        console.info(`Twitercredentials available from SECRET in VAULT on OCI: ${secretOCID}`)
+        const secretRetriever = require('../oci-secret-retriever/oci-secret-retriever.js');        
         const secretValue = await secretRetriever.retrieveSecret(secretOCID)
         const twitterCredentials = JSON.parse(secretValue.replace(/'/g, '"')) // secret is defined with single quotation marks, which is not processed correctly
         return twitterCredentials
