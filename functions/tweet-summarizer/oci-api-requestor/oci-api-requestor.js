@@ -22,6 +22,7 @@ const executeOCIAPIRequest = async function (requestOptions, body) {
                 data += chunk
             });
             res.on('end', () => {
+                console.info(`OCI API Request complete  ${data}`)
                 resolve(data)
             });
             res.on('error', (e) => {
