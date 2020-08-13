@@ -9,9 +9,9 @@ var jsSHA = require("jssha");
 
 const executeOCIAPIRequest = async function (requestOptions, body) {
     assert(process.env.PRIVATE_KEY_FILE != null || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM != null)
-    assert(process.env.KEY_FINGERPRINT != null)
-    assert(process.env.TENANCY_ID != null)
-    assert(process.env.USER_ID != null)
+    assert(process.env.KEY_FINGERPRINT != null || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM != null)
+    assert(process.env.TENANCY_ID != null || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM != null)
+    assert(process.env.USER_ID != null || process.env.OCI_RESOURCE_PRINCIPAL_PRIVATE_PEM != null)
 
 
     return new Promise((resolve, reject) => {
