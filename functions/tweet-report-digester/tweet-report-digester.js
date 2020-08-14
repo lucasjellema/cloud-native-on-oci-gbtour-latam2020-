@@ -11,9 +11,11 @@ const digestTweetReport = async function (objectName, bucketName) {
 
     // two parallel activities: stream and nosql persist
     const streamResult = await tweetStreamer.publishTweetsOnStream({"tweets": tweets})
+    console.log(`StreamResult is in ${JSON.stringify(streamResult)}`)
     const tweetPersistenceReport = await tweetPersister.persistTweets({"tweets":tweets})
+    console.log(`PersistenceResult is in ${JSON.stringify(tweetPersistenceReports)}`)
     return {
-        "request": { "filename": objectName, "tweets":tweets }
+        "request": { "filename": objectName}
         , "result": {"streamPublicationResult": streamResult, "persistenceResult": tweetPersistenceReport}
     }
 }
