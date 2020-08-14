@@ -67,7 +67,7 @@ from the function's home directory:
 
 fn -v deploy --app "lab1"
 
-echo -n '{"filename":"tweets-Biden-2020-08-13T10:58:16.json"}' | fn invoke "lab1" "tweet-report-digester" --content-type application/json
+echo -n '{"filename":"tweets-Biden-2020-08-13T10_58_16.json"}' | fn invoke "lab1" "tweet-report-digester" --content-type application/json
 
 ### technical design
 
