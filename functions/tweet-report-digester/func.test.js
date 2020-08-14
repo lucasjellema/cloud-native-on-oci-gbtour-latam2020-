@@ -28,7 +28,7 @@ describe('Func', () => {
     // simply require func.js registers the function (input, context) with mock fdk
     const func = require('./func.js');
     const fdk = require('@fnproject/fdk');
-    const objectName = `tweets-Biden-2020-08-13T10:58:16.json`
+    const objectName = `tweets-Biden-2020-08-13T10_58_16.json`
     const input ={ "filename" : objectName}
     const context = {
         "headers": {
@@ -36,6 +36,7 @@ describe('Func', () => {
         }
     }
     const theFunction = fdk.functionCache() // get the function that was registered in func.js with the (mock) fdk handler
+    const THIRTY_SECONDS = 30000
     test(`Test of func.js `, async () => {
 
         const result = await theFunction(input, context)
@@ -44,5 +45,5 @@ describe('Func', () => {
         expect(result.result).toHaveProperty("persistenceResult")
         
 
-    })
+    }, THIRTY_SECONDS)
 })

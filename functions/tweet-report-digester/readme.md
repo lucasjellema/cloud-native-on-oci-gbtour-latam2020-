@@ -21,7 +21,9 @@ Fn func =>  Tweet Report Digester  => OCI Streaming
 Note: environment details are not passed to the module as (functional) parameter, but instead through environment variables. Variables can be set for:
 - OCI authentication: OCI config & private key
 - OCI Object Storage: bucket, namespace (, compartment?)      
- Environment Variables: COMPARTMENT_OCID, TABLE_OCID, STREAM_OCID, REGION, NAMESPACE  
+ Environment Variables: 
+ App: COMPARTMENT_OCID,  REGION, OCI_NAMESPACE 
+ Function: TABLE_OCID, STREAM_OCID,TWITTER_REPORTS_BUCKET
 
 assumption:
 Function through a Dynamic Group benefit from policy that allows the dynamic group to read from Object Storage, write to NoSQL Databasea and to publish to Stream
@@ -54,41 +56,18 @@ git clone https://github.com/lucasjellema/cloud-native-on-oci-gbtour-latam2020-
 
 cd cloud-native-on-oci-gbtour-latam2020-/functions/tweet-report/digester
 
-configure fn
+fn use context us-ashburn-1
 
-export TENANCY_OCID=ocid1.tenancy.oc1..aaaaaaaag7c7slwmlvsodyym662ixlsonnihko2igwpjwwe2egmlf3gg6okq
-export compartmentId=ocid1.compartment.oc1..aaaaaaaaf2a5o5jblcapqarilphbl4v6lop3nc2nyyt3mfpwmsandebwhwoa
-export REGION=us-ashburn-1
-export REGION=$(oci iam region-subscription list | jq -r '.data[0]."region-name"')
-export REGION_KEY=$(oci iam region-subscription list | jq -r '.data[0]."region-key"')
-export USER_OCID=$(oci iam user list --all | jq -r  '.data |sort_by(."time-created")| .[0]."id"')
-
-fn create context gb-fn-context --provider oracle
-
-fn use context gb-fn-context
-
-fn update context oracle.compartment-id $compartmentId
-fn update context api-url https://functions.$REGION.oci.oraclecloud.com
-r=$(fn update context registry ${REGION_KEY,,}.ocir.io/$ns/cloudlab-repo)
-
-fn update context oracle.profile FN
-NAMESPACE=$(oci os ns get| jq -r  '.data')
-USER_USERNAME=$(oci iam user list --all | jq -r  '.data |sort_by(."time-created")| .[0]."name"')
-echo "Username for logging in into Container Registry is $NAMESPACE/$USER_USERNAME"
-
-docker login ${REGION_KEY,,}.ocir.io
+# set lab-compartment as context
+fn update context oracle.compartment-id ocid1.compartment.oc1..aaaaaaaa5q2srleka3ll2xgpcdj3uns3nshzc3lbn2wgx2kcuah5blh47icq  
 
 
 # create function  app
-define SECRET_OCID on function app
-
-fn create app "gb-app" --annotation "oracle.com/oci/subnetIds=[\"$subnetId\"]"
-
 from the function's home directory:
 
-fn -v deploy --app "gb-app"
+fn -v deploy --app "lab1"
 
-echo -n '{"filename":"tweets-Biden-2020-08-13T10:58:16.json"}' | fn invoke "gb-app" "tweet-report-digester" --content-type application/json
+echo -n '{"filename":"tweets-Biden-2020-08-13T10:58:16.json"}' | fn invoke "lab1" "tweet-report-digester" --content-type application/json
 
 ### technical design
 

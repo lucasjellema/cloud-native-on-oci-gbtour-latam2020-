@@ -28,15 +28,15 @@ describe('Tweet Persister', () => {
     });
 
     const tweetPersister = require('./tweet-persister.js');
-
+const THIRTY_SECONDS = 30000
     test(`Test that tweet is apparently persisted`, async () => {
-        const tweets = [{"id":1214, "text":"Dummy Tweet2", "author":"The Real Daisy", "language":"English", "hashtags":"#browns "}
-    ,{"id":1216, "text":"another Tweet", "author":"My Tweetress", "language":"English", "hashtags":"#no #tags "}]
+        const tweets = [{"id":1214+new Date().getTime(), "tweetText":"Dummy Test Tweet2", "author":"The Real Daisy", "language":"English", "hashtags":"#browns "}
+    ,{"id":1216+new Date().getTime(), "tweetText":"another test Tweet", "author":"My Tweetress", "language":"English", "hashtags":"#no #tags "}]
         const tweetPersistenceReport = await tweetPersister.persistTweets({"tweets":tweets})
         expect(tweetPersistenceReport.size).toBe(tweets.size)
         
 
-    })
+    },THIRTY_SECONDS)
     test(`Test that TABLE_OCID is mandatory environment variable`, async () => {
         process.env.TABLE_OCID = null
         expect.hasAssertions();

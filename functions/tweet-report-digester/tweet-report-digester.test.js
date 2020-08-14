@@ -19,22 +19,23 @@ describe('Tweet Report Digester', () => {
         process.env.TABLE_OCID = "ocid1.nosqltable.oc1.iad.amaaaaaa6sde7caa5pkd3yrfwfkigw4n7iwyn2avng4wbdi6nyw7cxnqm7fq"
     });
 
+
     afterAll(() => {
         process.env = OLD_ENV; // restore old env
     });
 
     const tweetReportDigester = require('./tweet-report-digester.js');
-
+    const THIRTY_SECONDS = 30000
     test(`Test that request is returned in result`, async () => {
-        const objectName = `tweets-Biden-2020-08-13T10:58:16.json`
+        const objectName = `tweets-Biden-2020-08-13T10_58_16.json`
         const bucketName = "twitter-reports"
         
         const tweetReportDigestionReport = await tweetReportDigester.digestTweetReport(objectName, bucketName)
         expect(tweetReportDigestionReport.request.filename).toBe(objectName)
-        expect(tweetReportDigestionReport.request).toHaveProperty("tweets")
+        expect(tweetReportDigestionReport.request).toHaveProperty("numberOfTweets")
         expect(tweetReportDigestionReport.result).toHaveProperty("streamPublicationResult")
         expect(tweetReportDigestionReport.result).toHaveProperty("persistenceResult")
-    })
+    },THIRTY_SECONDS)
     test(`Test that stream OCID is mandatory`, async () => {
         process.env.STREAM_OCID = null;
         expect.hasAssertions();

@@ -28,7 +28,8 @@ describe('OCI Object Reader', () => {
 
     test(`Test that result exists and contains property object ocid`, async () => {
         const result = await objectReader.readObject(objectName, bucketName)
-        expect(result).toBeDefined()     
+        expect(result).toBeDefined() 
+        expect(result.response.length).toBeGreaterThan(10)    
     
     })
     test(`Test that Namespace must be set`, async () => {
