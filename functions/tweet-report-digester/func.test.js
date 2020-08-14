@@ -15,6 +15,9 @@ describe('Func', () => {
         process.env.REGION = ociRegion
         process.env.COMPARTMENT_OCID = configs.compartmentId
         process.env.OCI_NAMESPACE = configs.namespaceName
+        process.env.STREAM_OCID = "ocid1.stream.oc1.iad.amaaaaaa6sde7caa2z74vlzm7ssoqd3q6qixbrineq7xxl2luffnvbpffxfa"
+        process.env.TABLE_OCID = "ocid1.nosqltable.oc1.iad.amaaaaaa6sde7caa5pkd3yrfwfkigw4n7iwyn2avng4wbdi6nyw7cxnqm7fq"
+        process.env.TWITTER_REPORTS_BUCKET = "twitter-reports"
     });
 
     afterAll(() => {
@@ -25,7 +28,8 @@ describe('Func', () => {
     // simply require func.js registers the function (input, context) with mock fdk
     const func = require('./func.js');
     const fdk = require('@fnproject/fdk');
-    const input ={ "filename" : "somefile"}
+    const objectName = `tweets-Biden-2020-08-13T10:58:16.json`
+    const input ={ "filename" : objectName}
     const context = {
         "headers": {
             "Host": "localhost", "Content-Type": "application/json"
@@ -36,7 +40,9 @@ describe('Func', () => {
 
         const result = await theFunction(input, context)
         expect(result.queryData).toHaveProperty("filename")
-
+        expect(result.result).toHaveProperty("streamPublicationResult")
+        expect(result.result).toHaveProperty("persistenceResult")
+        
 
     })
 })

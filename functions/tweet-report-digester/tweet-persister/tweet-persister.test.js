@@ -4,6 +4,8 @@ const configs = require('../oci-api-requestor/oci-configuration').configs;
 // oci nosql table create --compartment-id ocid1.compartment.oc1..aaaaaaaa5q2srleka3ll2xgpcdj3uns3nshzc3lbn2wgx2kcuah5blh47icq  --name TWEETS_TABLE --ddl-statement "CREATE TABLE IF NOT EXISTS TWEETS_TABLE (id LONG, text STRING, author STRING,tweet_timestamp TIMESTAMP(0), language STRING, hashtags STRING, PRIMARY KEY(SHARD(id)))" --table-limits="{\"maxReadUnits\": 60,  \"maxStorageInGBs\": 1,  \"maxWriteUnits\": 15 }" 
 
 // oci nosql query execute --compartment-id ocid1.compartment.oc1..aaaaaaaa5q2srleka3ll2xgpcdj3uns3nshzc3lbn2wgx2kcuah5blh47icq --statement="INSERT INTO TWEETS_TABLE  (id, text,author, tweet_timestamp, language, hashtags)  VALUES (2,\"My Cool Tweet #cool\",\"Lucas\", CAST(\"2020-06-24T14:58:05\" AS TIMESTAMP), \"en\",\"#cool #aioug\")"
+
+// oci nosql query execute --compartment-id ocid1.compartment.oc1..aaaaaaaa5q2srleka3ll2xgpcdj3uns3nshzc3lbn2wgx2kcuah5blh47icq --statement="DELETE FROM TWEETS_TABLE"
 describe('Tweet Persister', () => {
     const OLD_ENV = process.env;
 

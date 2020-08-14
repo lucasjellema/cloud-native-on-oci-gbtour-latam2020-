@@ -1,32 +1,30 @@
-# Tweet Summarizer
+# Tweet Report Digester
 
-this module reads tweets for a specified hashtag from Twitter over the last X minutes
-and creates a JSON report with all tweets retrieved
-and writes this report to OCI Object Storage
+this module a tweet report from OCI Object Storage (as written by function Tweet Summarizer); each tweet from the report is persisted as record in an NoSQL Database and published as message on a Stream.
+
+The name of the object to digest is passed in as input parameter - the bucket and namespace are taken from environment variables, as are the OCIDs for the table and stream to persist and publish to.
 
 
 ## technical notes
 the module is to be wrapped in an Fn Function to be deployed on OCI Functions platform
 when deployed as Function, the Function will benefit from a dynamic group policy on OCI to become Resource enabled (and get a generated private key and configuration file injected); when running stand alone, the module needs a stand alone OCI private key file and configuration file.
 
-the module assumes it retrieves Twitter Client Credentials from an OCI Vault in the form of a secret. the module could also be allowed to use locally defined credentials.
 
             OCI Private Key & Config
              |  
-             v
-Fn func =>  Tweet Summarizer  =>  OCI Object Storage
-             |           |
-             v           v
-             Twitter     OCI Vault
+             v                     => OCI NoSQL Database
+Fn func =>  Tweet Report Digester  => OCI Streaming
+             |           
+             v           
+      OCI Object Storage
 
 Note: environment details are not passed to the module as (functional) parameter, but instead through environment variables. Variables can be set for:
-- vault & secret:secret ocid
 - OCI authentication: OCI config & private key
 - OCI Object Storage: bucket, namespace (, compartment?)      
- Environment Variables: COMPARTMENT_OCID, SECRET_OCID, REGION, NAMESPACE  
+ Environment Variables: COMPARTMENT_OCID, TABLE_OCID, STREAM_OCID, REGION, NAMESPACE  
 
 assumption:
-Function through a Dynamic Group benefit from policy that allows the dynamic group 
+Function through a Dynamic Group benefit from policy that allows the dynamic group to read from Object Storage, write to NoSQL Databasea and to publish to Stream
 
 ## Dynamic Group and Policy 
 Create dynamic group *functions-in-gb-compartment* that has all functions in compartment *gb-compartment* as member:
@@ -36,13 +34,14 @@ export compartmentId=ocid1.compartment.oc1..aaaaaaaaf2a5o5jblcapqarilphbl4v6lop3
 export REGION=us-ashburn-1
 oci iam dynamic-group create --compartment-id $TENANCY_OCID --name "gb-tour-2020-latam-dynamic-group-functions" --description "to collect all functions in compartment gb-tour-2020-latam"  --matching-rule "[ \"ALL {resource.type = 'fnfunc', resource.compartment.id = '$compartmentId'}\"]" 
 
-Create a policy that grants read access on secrets in the *gb-tour-2020-latam* to all functions in that compartment :
+Create a policy that grants read access on objects in Object Storage in the *gb-tour-2020-latam* to all functions in that compartment :
+oci iam policy create  --name "read-object-permissions-for-resource-principal-enabled-functions-in-gb-tour-2020-latam-compartment" --compartment-id $compartmentId  --statements "[ \"allow dynamic-group gb-tour-2020-latam-dynamic-group-functions to read objects in compartment gb-tour-2020-latam\" ]" --description "to allow functions in gb-tour-2020-latam to read objects"
 
-oci iam policy create  --name "read-secret-permissions-for-resource-principal-enabled-functions-in-lab-compartment" --compartment-id $compartmentId  --statements "[ \"allow dynamic-group gb-tour-2020-latam-dynamic-group-functions to read secret-family in compartment gb-tour-2020-latam\" ]" --description "to allow functions in gb-tour-2020-latam to read secrets"
+Create a policy that grants publish to Stream in the *gb-tour-2020-latam* to all functions in that compartment :
+oci iam policy create  --name "publish-stream-permissions-for-resource-principal-enabled-functions-in-lab-compartment" --compartment-id $compartmentId  --statements "[ \"allow dynamic-group functions-in-lab-compartment to use stream-push  in compartment lab-compartment\" ]" --description "to allow functions in lab-compartment to push messages to streams"
 
-
-Create a policy that grants write access on objects in Object Storage in the *gb-tour-2020-latam* to all functions in that compartment :
-oci iam policy create  --name "write-object-permissions-for-resource-principal-enabled-functions-in-gb-tour-2020-latam-compartment" --compartment-id $compartmentId  --statements "[ \"allow dynamic-group gb-tour-2020-latam-dynamic-group-functions to manage objects in compartment gb-tour-2020-latam\" ]" --description "to allow functions in gb-tour-2020-latam to read secrets"
+Create a policy that grants create record in NoSQL Database in the *gb-tour-2020-latam* to all functions in that compartment :
+oci iam policy create  --name "update-row-permissions-for-resource-principal-enabled-functions-in-lab-compartment" --compartment-id $compartmentId  --statements "[ \"allow dynamic-group functions-in-lab-compartment to use nosql-rows in compartment lab-compartment\" ]" --description "to allow functions in compartment lab to read, create and update table rows in NoSQL Tables in Compartment Lab"
 
 
 Also create policy to access NoSQL Database and Streams from functions
@@ -53,7 +52,7 @@ start cloudshell
 
 git clone https://github.com/lucasjellema/cloud-native-on-oci-gbtour-latam2020-
 
-cd /home/jellema/cloud-native-on-oci-gbtour-latam2020-/functions/tweet-summarizer
+cd cloud-native-on-oci-gbtour-latam2020-/functions/tweet-report/digester
 
 configure fn
 
@@ -89,33 +88,24 @@ from the function's home directory:
 
 fn -v deploy --app "gb-app"
 
-echo -n '{"hashtag":"Biden", "minutes":50}' | fn invoke "gb-app" "tweet-summarizer" --content-type application/json
+echo -n '{"filename":"tweets-Biden-2020-08-13T10:58:16.json"}' | fn invoke "gb-app" "tweet-report-digester" --content-type application/json
 
 ### technical design
 
 module is implemented using Node
-the module has a side-effect - creation of a file on OCI Object Storage; the module has a composed result object, that contains { "request" {startdate, enddate, hashtag}; "result" {number of tweets, filename, file OCID}}
-
-* tweet-summarizer
-  * retrieve tweets (given number of minutes and hashtags, retrieve tweets and return as JSON document) - this module needs Twitter credentials; it uses npm module twit
-  * prepare tweet report (given result from retrieve tweets, produce JSON document)
-  * write file to OCI object storage bucket - this module needs target compartment, namespace, bucket
-
-  * oci-secret-retriever (to retrieve a secret from an OCI Vault) - takes secret OCID (or name?), vault OCID (or name) and compartment OCID (or name); returns the plain text (not base64 encoded) contents of the secret
-  * oci-api-requestor (to make requests of OCI REST API - such as get secret from vault and write file to object storage) - this module need to use private key and config (either from local files or inject ); it uses npm modules http-signature and jssha
+the module has a side-effect - creation of records in NoSQL Database table and messages on a Stream; the module has a composed result object
 
 func.js => 
 |
-tweet-summarizer.js ( => oci-secret-retriever -> oci-api-requestor)
-|- tweet-retriever (input: twitter credential provider, hashtag, number of minutes of history from now)  -> twit
-|- tweet-report-processor (input: twitter search result)
-|- oci-object-writer (input: print-ready JSON object, bucket)
+tweet-report-digester.js 
+|- oci-object-reader 
+|- tweet-streamer 
    |- oci-api-requestor
-|- oci-secret-retriever (input: secret ocid)
-   |- oci-api-requestor   
+|- tweet-persister
+   |- oci-nosql-database-persister
+      |- oci-api-requestor   
 
 testing is done through Jest
 
 deployment as Function to OCI is done using OCI CLI
 
-test cases

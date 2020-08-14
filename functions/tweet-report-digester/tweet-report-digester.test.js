@@ -32,7 +32,8 @@ describe('Tweet Report Digester', () => {
         const tweetReportDigestionReport = await tweetReportDigester.digestTweetReport(objectName, bucketName)
         expect(tweetReportDigestionReport.request.filename).toBe(objectName)
         expect(tweetReportDigestionReport.request).toHaveProperty("tweets")
-
+        expect(tweetReportDigestionReport.result).toHaveProperty("streamPublicationResult")
+        expect(tweetReportDigestionReport.result).toHaveProperty("persistenceResult")
     })
     test(`Test that stream OCID is mandatory`, async () => {
         process.env.STREAM_OCID = null;
