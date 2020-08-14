@@ -22,7 +22,7 @@ describe('OCI Object Reader', () => {
 
     const objectReader = require('./oci-object-reader.js');
 
-    const objectName = `tweets-Biden-2020-08-13T10:58:16.json`
+    const objectName = `tweets-covid19-2020-08-14T14:39:18.json`
     const bucketName = "twitter-reports"
     
 

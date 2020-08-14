@@ -28,7 +28,7 @@ describe('Func', () => {
     // simply require func.js registers the function (input, context) with mock fdk
     const func = require('./func.js');
     const fdk = require('@fnproject/fdk');
-    const objectName = `tweets-Biden-2020-08-13T10_58_16.json`
+    const objectName = `tweets-ajax-2020-08-14T15:05:10.json`
     const input ={ "filename" : objectName}
     const context = {
         "headers": {

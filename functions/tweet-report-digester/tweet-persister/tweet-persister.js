@@ -18,7 +18,7 @@ const persistTweets = async function (tweetsReport) {
         let result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
         if (result.code && "InvalidAuthorization" == result.code) {
             
-            record.tweetText = `encoded: ${escape(record.tweetText)}`
+            record.text = `encoded: ${escape(record.text)}`
             record.author = escape(record.author)
             result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
             if (result.code && "InvalidAuthorization" == result.code) {

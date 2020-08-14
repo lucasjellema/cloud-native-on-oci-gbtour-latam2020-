@@ -27,7 +27,7 @@ describe('Tweet Report Digester', () => {
     const tweetReportDigester = require('./tweet-report-digester.js');
     const THIRTY_SECONDS = 30000
     test(`Test that request is returned in result`, async () => {
-        const objectName = `tweets-Biden-2020-08-13T10_58_16.json`
+        const objectName = `tweets-covid19-2020-08-14T14:39:18.json`
         const bucketName = "twitter-reports"
         
         const tweetReportDigestionReport = await tweetReportDigester.digestTweetReport(objectName, bucketName)
