@@ -18,7 +18,8 @@ const persistTweets = async function (tweetsReport) {
         let result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
         if (result.code && "InvalidAuthorization" == result.code) {
             
-            record.tweetText = escape(record.tweetText)
+            record.tweetText = `encoded: ${escape(record.tweetText)}`
+            record.author = escape(record.author)
             result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
             if (result.code && "InvalidAuthorization" == result.code) {
                 console.log(`problem with persisting tweet ${JSON.stringify(tweet)}; probably characters in the tweet text or author name that give problems in the signing of the HTTP request`)
