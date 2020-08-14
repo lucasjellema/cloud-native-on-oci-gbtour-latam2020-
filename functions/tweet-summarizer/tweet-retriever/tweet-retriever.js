@@ -1,6 +1,7 @@
 var assert = require('assert');
 const Twit = require('twit')
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60
+const NUMBER_OF_TWEETS_RETURNED = 30; //maximum number supported in search API is 100
 
 const retrieveTweets = async function (hashtag, minutes = 5) {
     assert(minutes > 0)
@@ -27,7 +28,7 @@ const getTwitterCredentials = async function () {
     return require(process.env.TWITTER_CREDENTIALS_FILE).twitter_client_credentials
 }
 
-const NUMBER_OF_TWEETS_RETURNED = 100; //maximum number supported in search API is 100
+
 
 const queryTweets = async (hashtag, howFarBack, twitterClientCredentials) => {
     return new Promise((resolve, reject) => {
