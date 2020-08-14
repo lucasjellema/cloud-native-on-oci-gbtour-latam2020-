@@ -8,7 +8,7 @@ const persistTweets = async function (tweetsReport) {
         tweet = tweetsReport.tweets[i]
         let record =  {
             // certain characters in tweetText prevent signing from taking place correctly
-            "id": parseInt(tweet.id), "text": escape(tweet.tweetText), 
+            "id": parseInt(tweet.id), "text": tweet.tweetText, 
             "author": tweet.author, "tweet_timestamp": tweet.creationTime
             , "language": tweet.lang, "hashtags": tweet.hashtags
         }
