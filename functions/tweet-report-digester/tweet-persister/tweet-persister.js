@@ -18,8 +18,9 @@ const persistTweets = async function (tweetsReport) {
         let result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
         if (result.code && "InvalidAuthorization" == result.code) {
             
-            record.text = `encoded: ${escape(record.text)}`
-            record.author = escape(record.author)
+            record.text = `encoded: ${asciiProofString(record.text)}`
+            record.author = asciiProofString(record.author)
+            record.hashtags = asciiProofString(record.hashtags)
             result = JSON.parse(await databasePersister.persistRecord(process.env.TABLE_OCID, record))
             if (result.code && "InvalidAuthorization" == result.code) {
                 console.log(`problem with persisting tweet ${JSON.stringify(tweet)}; probably characters in the tweet text or author name that give problems in the signing of the HTTP request`)
@@ -30,7 +31,11 @@ const persistTweets = async function (tweetsReport) {
     return persistenceReport
 }
 
-
+const asciiProofString = function (text) {
+    // source: https://bytefreaks.net/programming-2/javascript/javasript-remove-all-non-printable-and-all-non-ascii-characters-from-text
+    printable_ASCII_only_string = text.replace(/[^ -~]+/g, " ");
+    return printable_ASCII_only_string;
+}
 
 module.exports = {
     persistTweets: persistTweets
