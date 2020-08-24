@@ -22,8 +22,8 @@ describe('Tweet Summarizer', () => {
     });
 
     const tweetSummarizer = require('./tweet-summarizer.js');
-    const hashtag = "Trump"
-    const minutes = 60
+    const hashtag = "oracle"
+    const minutes = 10
     const twitterClientCredentialsSecretOCID = "ocid1.vaultsecret.oc1.iad.amaaaaaa6sde7caapotgnzrzq6lehyeeef3wprzwcyejk3gvh6prqxvicqxa"
 
     test(`Test that request is returned in result`, async () => {

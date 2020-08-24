@@ -4,7 +4,7 @@
   "description": "Consumes tweets for a specific hashtag over a specified period and writes a file on OCI Object Storage",
   "main": "tweet-summarizer.js",
   "scripts": {
-    "test": "jest --coverage=true --coverageProvider=v8 "
+    "test": "jest --coverage=true --coverageProvider=v8 -t='unit-test'"
   },
   "author": "Lucas Jellema",
   "license": "ISC",

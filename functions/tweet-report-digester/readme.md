@@ -69,6 +69,10 @@ fn -v deploy --app "lab1"
 
 echo -n '{"filename":"tweets-Biden-2020-08-13T10_58_16.json"}' | fn invoke "lab1" "tweet-report-digester" --content-type application/json
 
+API Gateway
+
+https://a7otzunjmey252aivwp2gfhrfq.apigateway.us-ashburn-1.oci.customer-oci.com/my-depl1/gb/digest-tweetreport?filename=tweets-ajax-2020-08-14T15:05:10.json
+
 ### technical design
 
 module is implemented using Node

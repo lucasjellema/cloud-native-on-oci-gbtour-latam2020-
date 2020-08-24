@@ -87,6 +87,11 @@ fn -v deploy --app "gb-app"
 
 echo -n '{"hashtag":"Biden", "minutes":50}' | fn invoke "lab1" "tweet-summarizer" --content-type application/json
 
+
+API Gateway
+
+https://a7otzunjmey252aivwp2gfhrfq.apigateway.us-ashburn-1.oci.customer-oci.com/my-depl1/gb/summarize-tweets?hashtag=covid19&minutes=10
+
 ### technical design
 
 module is implemented using Node
@@ -104,7 +109,6 @@ func.js =>
 |
 tweet-summarizer.js ( => oci-secret-retriever -> oci-api-requestor)
 |- tweet-retriever (input: twitter credential provider, hashtag, number of minutes of history from now)  -> twit
-|- tweet-report-processor (input: twitter search result)
 |- oci-object-writer (input: print-ready JSON object, bucket)
    |- oci-api-requestor
 |- oci-secret-retriever (input: secret ocid)

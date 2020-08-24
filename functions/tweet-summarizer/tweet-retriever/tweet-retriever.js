@@ -1,15 +1,17 @@
 var assert = require('assert');
-const Twit = require('twit')
+const Twit = require('twit');
+
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60
 const NUMBER_OF_TWEETS_RETURNED = 30; //maximum number supported in search API is 100
 
 const retrieveTweets = async function (hashtag, minutes = 5) {
     assert(minutes > 0)
     assert(minutes < SEVEN_DAYS_IN_MINUTES)  // the Twitter search api used in this module has a 7 day limit
+    
     let tweetsRetrieved = []
-    // get twitter credentials - from local file or from OCI Secret
+    // // get twitter credentials - from local file or from OCI Secret
     let twitterClientCredentials = await getTwitterCredentials()
-    // invoke Twitter API
+    // // invoke Twitter API
     tweetsRetrieved = await queryTweets(hashtag, minutes, twitterClientCredentials)
     return tweetsRetrieved
 }
@@ -20,7 +22,8 @@ const getTwitterCredentials = async function () {
     if (secretOCID) {
         console.info(`Twitercredentials available from SECRET in VAULT on OCI: ${secretOCID}`)
         const secretRetriever = require('../oci-secret-retriever/oci-secret-retriever.js');        
-        const secretValue = await secretRetriever.retrieveSecret(secretOCID)
+
+        const secretValue = await secretRetriever.retrieveSecret(secretOCID)        
         const twitterCredentials = JSON.parse(secretValue.replace(/'/g, '"')) // secret is defined with single quotation marks, which is not processed correctly
         return twitterCredentials
     }

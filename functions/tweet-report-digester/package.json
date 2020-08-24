@@ -4,7 +4,7 @@
   "description": "Process file with Tweets into individual Tweet messages on an OCI Stream and individual Tweet records in OCI NoSQL Database",
   "main": "tweet-report-digester.js",
   "scripts": {
-    "test": "jest --coverage=true --coverageProvider=v8  "
+    "test": "jest --coverage=true --coverageProvider=v8 -t 'func' "
   },
   "author": "Lucas Jellema",
   "license": "ISC",
